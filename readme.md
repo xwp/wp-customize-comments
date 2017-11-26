@@ -11,6 +11,8 @@ Edit comments with live preview and bundle edits in changesets.
 **License:** [GPLv2 or later](http://www.gnu.org/licenses/gpl-2.0.html)  
 **Requires PHP:** 5.4  
 
+[![Build Status](https://travis-ci.org/xwp/wp-customize-comments.svg?branch=master)](https://travis-ci.org/xwp/wp-customize-comments) 
+
 ## Description ##
 
 This plugin is a proof of concept for how comment editing might be added to the Customizer, with edits to comments being staged in changesets along with any other changes made in customziation session. It demonstrates scalable lazy-loading of controls/settings via the REST API. It demonstrates both dynamic settings and dynamic partials.

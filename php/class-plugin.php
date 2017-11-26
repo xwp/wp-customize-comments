@@ -35,7 +35,7 @@ class Plugin {
 	 */
 	public function enqueue_controls_scripts() {
 		$handle = 'customize-comments-controls';
-		$src = plugin_dir_url( __FILE__ ) . '/controls.js';
+		$src = plugin_dir_url( __DIR__ ) . '/js/controls.js';
 		wp_enqueue_script( $handle, $src, array( 'customize-controls', 'wp-api' ) );
 		$exports = array(
 			'l10n' => array(
@@ -53,7 +53,7 @@ class Plugin {
 	 */
 	public function enqueue_preview_scripts() {
 		$handle = 'customize-comments-preview';
-		$src = plugin_dir_url( __FILE__ ) . '/preview.js';
+		$src = plugin_dir_url( __DIR__ ) . '/js/preview.js';
 		wp_enqueue_script( $handle, $src, array( 'customize-selective-refresh' ) );
 		wp_add_inline_script( $handle, 'customizeCommentsPreview.init();' );
 	}

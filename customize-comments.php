@@ -30,6 +30,6 @@
 
 namespace Customize_Comments;
 
-require_once __DIR__ . '/class-plugin.php';
+require_once __DIR__ . '/php/class-plugin.php';
 $customize_comments_plugin = new Plugin();
 add_action( 'plugins_loaded', array( $customize_comments_plugin, 'init' ) );
