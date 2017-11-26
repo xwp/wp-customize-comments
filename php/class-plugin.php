@@ -34,6 +34,10 @@ class Plugin {
 	 * Enqueue scripts needed by the controls app.
 	 */
 	public function enqueue_controls_scripts() {
+		if ( ! current_user_can( 'moderate_comments' ) ) {
+			return;
+		}
+
 		$handle = 'customize-comments-controls';
 		$src = plugin_dir_url( __DIR__ ) . '/js/controls.js';
 		wp_enqueue_script( $handle, $src, array( 'customize-controls', 'wp-api' ) );
@@ -52,6 +56,10 @@ class Plugin {
 	 * Enqueue scripts needed by the preview app.
 	 */
 	public function enqueue_preview_scripts() {
+		if ( ! current_user_can( 'moderate_comments' ) ) {
+			return;
+		}
+
 		$handle = 'customize-comments-preview';
 		$src = plugin_dir_url( __DIR__ ) . '/js/preview.js';
 		wp_enqueue_script( $handle, $src, array( 'customize-selective-refresh' ) );
