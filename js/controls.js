@@ -34,30 +34,29 @@ var customizeCommentsControls = (function( api ) {
 	 */
 	component.ready = function ready() {
 		wp.api.loadPromise.done( function() {
+
 			component.collection = new wp.api.collections.Comments();
+
+			// Supply default params to fetch requests.
+			component.collection.fetch = (function( fetch ) {
+				return function( options ) {
+					var opts = _.extend( {}, options );
+					opts.data = _.extend(
+						{
+							context: 'edit',
+							_embed: true,
+							customize_changeset_uuid: api.settings.changeset.uuid
+						},
+						options.data || {}
+					);
+					return fetch.call( this, opts );
+				};
+			})( component.collection.fetch );
+
 			api.section( 'comments', component.configureSection );
 		} );
 
 		api.previewer.bind( 'edit-comment', component.handleEditCommentMessage );
-	};
-
-	/**
-	 * Fetch comments.
-	 *
-	 * @param {object} [params={}] Params.
-	 * @returns {Promise} Request.
-	 */
-	component.fetchComments = function fetchComments( params ) {
-		return component.collection.fetch({
-			data: _.extend(
-				{
-					context: 'edit',
-					_embed: true,
-					customize_changeset_uuid: api.settings.changeset.uuid
-				},
-				params || {}
-			)
-		});
 	};
 
 	/**
@@ -125,8 +124,10 @@ var customizeCommentsControls = (function( api ) {
 		}
 
 		// Otherwise, fetch the comment from the REST API.
-		request = component.fetchComments( {
-			include: commentId
+		request = component.collection.fetch( {
+			data: {
+				include: commentId
+			}
 		} );
 		request.done( function( comments ) {
 			var added = component.add( comments[0] );
@@ -193,21 +194,22 @@ var customizeCommentsControls = (function( api ) {
 	 */
 	component.loadMoreComments = function loadMoreComments() {
 		var request;
-		component.loading.set( true );
-
-		request = component.fetchComments( {
-			page: component.currentPage.get()
+		component.loading.set( true ); // Disables load-more button.
+		request = component.collection.fetch( {
+			data: {
+				page: component.currentPage.get()
+			}
 		} );
-
 		request.always( function() {
 			component.loading.set( false );
 		} );
-
 		request.done( function( comments ) {
-			component.currentPage.set( component.currentPage.get() + 1 );
 
+			// Register setting & control for each comment.
 			_.each( comments, component.add );
 
+			// Update state for next page of comments.
+			component.currentPage.set( component.currentPage.get() + 1 );
 			component.allLoaded.set( 0 === comments.length );
 		} );
 	};
