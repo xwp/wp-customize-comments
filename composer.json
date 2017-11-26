@@ -1,0 +1,20 @@
+{
+    "name": "xwp/customize-comments",
+    "description": "Edit comments with live preview and bundle edits in changesets.",
+    "type": "wp-plugin",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Weston Ruter",
+            "email": "weston@xwp.co"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "wp-coding-standards/wpcs": "*",
+        "wimg/php-compatibility": "*",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.4.3"
+    }
+}
