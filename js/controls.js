@@ -1,7 +1,7 @@
 /* eslint no-magic-numbers: [ "error", { "ignore": [0,1] } ] */
 /* exported customizeCommentsControls */
 
-var customizeCommentsControls = (function( api ) {
+var customizeCommentsControls = (function( api, $ ) {
 	'use strict';
 
 	var component = {
@@ -54,22 +54,25 @@ var customizeCommentsControls = (function( api ) {
 			})( component.collection.fetch );
 
 			api.section( 'comments', component.configureSection );
+
+			// Ensure there are controls created for every comment_content setting created.
+			api.each( component.ensureControl );
+			api.bind( 'add', component.ensureControl );
 		} );
 
 		api.previewer.bind( 'edit-comment', component.handleEditCommentMessage );
 	};
 
 	/**
-	 * Add a comment to the section.
+	 * Ensure a comment_content setting exists.
 	 *
 	 * @param {object} comment - Comment resource from REST API.
-	 * @return {{control: wp.customize.Control, setting: wp.customize.Setting}} Added control and setting.
+	 * @return {wp.customize.Setting} Added setting.
 	 */
-	component.add = function add( comment ) {
-		var customizeId, setting, control;
+	component.ensureSetting = function ensureSetting( comment ) {
+		var customizeId, setting;
 		customizeId = 'comment_content[' +  String( comment.id ) + ']';
 
-		// Ensure comment_content setting is created.
 		setting = wp.customize( customizeId );
 		if ( ! setting ) {
 			setting = new wp.customize.Setting( customizeId, comment.content.raw, {
@@ -77,34 +80,123 @@ var customizeCommentsControls = (function( api ) {
 			} );
 			wp.customize.add( setting );
 		}
+		return setting;
 
 		// Create control for comment content.
-		control = wp.customize.control( customizeId );
-		if ( ! control ) {
-			control = new wp.customize.Control( customizeId, {
-				section: 'comments',
-				type: 'textarea',
-				label: wp.template( 'comment-content-control-label' )( comment ),
-				description: wp.template( 'comment-content-control-description' )( comment ),
-				setting: setting,
-				input_attrs: {
-					'class': 'control-focus' // Make sure focus goes in input and not the link in description.
-				},
-				priority: -( new Date( comment.date_gmt ) ).valueOf() // Sort by date.
-			} );
-			wp.customize.control.add( control );
+		// control = wp.customize.control( customizeId );
+		// if ( ! control ) {
+		// 	control = new wp.customize.Control( customizeId, {
+		// 		section: 'comments',
+		// 		type: 'textarea',
+		// 		label: wp.template( 'comment-content-control-label' )( comment ),
+		// 		description: wp.template( 'comment-content-control-description' )( comment ),
+		// 		setting: setting,
+		// 		input_attrs: {
+		// 			'class': 'control-focus' // Make sure focus goes in input and not the link in description.
+		// 		},
+		// 		priority: -( new Date( comment.date_gmt ) ).valueOf() // Sort by date.
+		// 	} );
+		// 	wp.customize.control.add( control );
+		//
+		// 	// Load a comment's post into the preview when clicking on the post permalink in the description.
+		// 	control.container.on( 'click', '.comment-post-link', function( event ) {
+		// 		event.preventDefault();
+		// 		wp.customize.previewer.previewUrl.set( this.href );
+		// 	} );
+		// }
+		//
+		// return {
+		// 	control: control,
+		// 	setting: setting
+		// };
+	};
 
-			// Load a comment's post into the preview when clicking on the post permalink in the description.
-			control.container.on( 'click', '.comment-post-link', function( event ) {
-				event.preventDefault();
-				wp.customize.previewer.previewUrl.set( this.href );
-			} );
+	/**
+	 * Ensure comment_content control for a setting if it is a comment_content setting.
+	 *
+	 * @param {wp.customize.Setting} setting - Setting.
+	 * @returns {jQuery.Promise} Promise resolving with control for comment_content setting.
+	 */
+	component.ensureControl = function ensureControl( setting ) {
+		var idParts, comment, commentId, controlId, deferred = $.Deferred();
+		idParts = setting.id.replace( /]/g, '' ).split( /\[/ );
+		if ( 'comment_content' !== idParts[0] ) {
+			return deferred.reject().promise();
+		}
+		controlId = setting.id; // Named the same by convention/convenience.
+
+		// Short-circuit if the control already exists.
+		if ( api.control.has( controlId ) ) {
+			deferred.resolve( api.control( controlId ) );
+			return deferred.promise();
 		}
 
-		return {
-			control: control,
-			setting: setting
-		};
+		commentId = parseInt( idParts[1], 10 );
+		if ( isNaN( commentId ) ) {
+			throw new Error( 'Bad setting ID.' );
+		}
+
+		/**
+		 * Create control for comment content.
+		 *
+		 * @param {wp.api.models.Comment[]} comments - Fetched comments (only one should be included here).
+		 * @returns {void}
+		 */
+		function onFetched( comments ) {
+			if ( 1 === comments.length ) {
+				deferred.resolve( component.createCommentContentControl( comments[0] ) );
+			} else {
+				deferred.reject();
+			}
+		}
+
+		comment = component.collection.get( commentId );
+		if ( comment ) {
+			onFetched( [ comment ] );
+		} else {
+			component.collection.fetch( {
+				data: {
+					include: commentId
+				}
+			} ).done( onFetched ).fail( function() {
+				deferred.reject();
+			} );
+		}
+		return deferred.promise();
+	};
+
+	/**
+	 * Create a comment content control for a given comment.
+	 *
+	 * @param {object} comment - Comment as returned by REST API.
+	 * @returns {wp.customize.Control} Comment content control.
+	 */
+	component.createCommentContentControl = function createCommentContentControl( comment ) {
+		var control, customizeId;
+		customizeId = 'comment_content[' + String( comment.id ) + ']';
+		if ( api.control.has( customizeId ) ) {
+			return api.control( customizeId );
+		}
+		control = new api.Control( customizeId, {
+			section: 'comments',
+			type: 'textarea',
+			label: wp.template( 'comment-content-control-label' )( comment ),
+			description: wp.template( 'comment-content-control-description' )( comment ),
+			setting: customizeId,
+			input_attrs: {
+				'class': 'control-focus' // Make sure focus goes in input and not the link in description.
+			},
+			priority: -( new Date( comment.date_gmt ) ).valueOf() // Sort by date.
+		} );
+		api.control.add( control );
+
+		// Load a comment's post into the preview when clicking on the post permalink in the description.
+		control.container.on( 'click', '.comment-post-link', function( event ) {
+			event.preventDefault();
+			api.previewer.previewUrl.set( this.href );
+		} );
+
+		return control;
 	};
 
 	/**
@@ -116,8 +208,26 @@ var customizeCommentsControls = (function( api ) {
 	component.handleEditCommentMessage = function handleEditCommentMessage( commentId ) {
 		var controlId, request;
 
+		// @todo Make sure the setting is added.
+		component.collection.fetch( {
+			data: {
+				include: commentId
+			}
+		} ).done( function( comments ) {
+			var comment = comments.shift();
+			component.ensureSetting( comment );
+			api.control( 'comment_content[' + String( commentId ) + ']', function( control ) {
+				control.focus();
+			} );
+		} );
+
+		// component.ensureControl();
+
+		//controlId = 'comment_content[' + String( commentId ) + ']';
+
+		return;
+
 		// Focus on the control immediately if it has already been added.
-		controlId = 'comment_content[' + String( commentId ) + ']';
 		if ( api.control.has( controlId ) ) {
 			api.control( controlId ).focus();
 			return;
@@ -206,7 +316,7 @@ var customizeCommentsControls = (function( api ) {
 		request.done( function( comments ) {
 
 			// Register setting & control for each comment.
-			_.each( comments, component.add );
+			_.each( comments, component.ensureSetting );
 
 			// Update state for next page of comments.
 			component.currentPage.set( component.currentPage.get() + 1 );
@@ -234,4 +344,4 @@ var customizeCommentsControls = (function( api ) {
 	};
 
 	return component;
-})( wp.customize );
+})( wp.customize, jQuery );

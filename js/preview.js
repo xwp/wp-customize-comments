@@ -97,15 +97,15 @@ var customizeCommentsPreview = (function( api, $ ) {
 	 * Ensure comment_content partial for a setting if it is a comment_content setting.
 	 *
 	 * @param {wp.customize.Value} setting - Setting.
-	 * @returns {wp.customize.selectiveRefresh.Partial|null} Partial if one was created.
+	 * @returns {wp.customize.selectiveRefresh.Partial|null} Partial for comment_content setting, or null if not such a setting.
 	 */
-	component.ensurePartial = function( setting ) {
+	component.ensurePartial = function ensurePartial( setting ) {
 		var idParts, commentId, partialId, partial;
 		idParts = setting.id.replace( /]/g, '' ).split( /\[/ );
 		if ( 'comment_content' !== idParts[0] ) {
 			return null;
 		}
-		partialId = setting.id;
+		partialId = setting.id; // Named the same by convention/convenience.
 		if ( api.selectiveRefresh.partial.has( partialId ) ) {
 			return api.selectiveRefresh.partial( partialId );
 		}
