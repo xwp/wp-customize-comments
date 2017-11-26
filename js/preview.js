@@ -62,7 +62,8 @@ var customizeCommentsPreview = (function( api, $ ) {
 			{},
 			api.selectiveRefresh.Partial.prototype.defaults,
 			{
-				containerInclusive: false
+				containerInclusive: false,
+				fallbackRefresh: false
 			}
 		),
 
