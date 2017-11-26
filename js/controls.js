@@ -91,7 +91,7 @@ var customizeCommentsControls = (function( api ) {
 				input_attrs: {
 					'class': 'control-focus' // Make sure focus goes in input and not the link in description.
 				},
-				priority: -( new Date( comment.date_gmt )) .valueOf() // Sort by date.
+				priority: -( new Date( comment.date_gmt ) ).valueOf() // Sort by date.
 			} );
 			wp.customize.control.add( control );
 

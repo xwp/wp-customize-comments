@@ -29,7 +29,6 @@ var customizeCommentsPreview = (function( api, $ ) {
 		} );
 	};
 
-
 	/**
 	 * Autop.
 	 *
