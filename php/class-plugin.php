@@ -40,7 +40,7 @@ class Plugin {
 		$exports = array(
 			'l10n' => array(
 				'unableToFetchComment' => __( 'Unable to fetch comment for editing.', 'customize-comments' ),
-				'loadMoreComments' => __( 'Load More Comments@', 'customize-comments' ),
+				'loadMoreComments' => __( 'Load More Comments', 'customize-comments' ),
 				/* translators: 1 is comment author, and 2 is comment date */
 				'labelFormat' => __( 'By %1$s on %2$s', 'customize-comments' ),
 			),
