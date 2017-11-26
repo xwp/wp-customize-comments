@@ -8,7 +8,7 @@ License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: customizer, customize, comments
 
-Edit comments with live preview and bundle edits in changesets.
+Edit comments with live preview and bundle edits in Customizer changesets.
 
 == Description ==
 
@@ -19,3 +19,11 @@ A new Comments section is added to the Customizer, and when this section is expa
 The comments are listed with the comment author and publish date along with the post it was commented on. Only the comment's content is currently editable. When you do edit a comment that appears in the preview, then the comment will be previewed with selective refresh after a low-fidelity instant preview.
 
 When you navigate to a post and see the comment list, clicking the "Edit Comment" link in the Customizer preview will cause the comment to be loaded into a new textarea control in the section, and the control will then be focused for editing.
+
+This is a natural companion to the [Customize Posts](https://wordpress.org/plugins/customize-posts/) feature plugin.
+
+== Changelog ==
+
+= 2017-11-26 - 0.1.0 =
+
+Initial release.

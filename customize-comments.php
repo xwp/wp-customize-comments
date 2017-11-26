@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Customize Comments
- * Description: Edit comments with live preview and bundle edits in changesets.
+ * Description: Edit comments with live preview and bundle edits in Customizer changesets.
  * Plugin URI: https://github.com/xwp/wp-customize-comments/
  * Version: 0.1.0
  * Author: XWP

@@ -1,6 +1,6 @@
 {
     "name": "xwp/customize-comments",
-    "description": "Edit comments with live preview and bundle edits in changesets.",
+    "description": "Edit comments with live preview and bundle edits in Customizer changesets.",
     "type": "wp-plugin",
     "license": "GPL-2.0",
     "authors": [

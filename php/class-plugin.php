@@ -15,9 +15,22 @@ namespace Customize_Comments;
 class Plugin {
 
 	/**
+	 * Version.
+	 *
+	 * @var string
+	 */
+	public $version;
+
+	/**
 	 * Add hooks.
 	 */
 	public function init() {
+
+		// Parse plugin version.
+		if ( preg_match( '/Version:\s*(\S+)/', file_get_contents( __DIR__ . '/../customize-comments.php' ), $matches ) ) { // @codingStandardsIgnoreLine because file_get_contents() is not requesting a URL.
+			$this->version = $matches[1];
+		}
+
 		add_action( 'customize_register', array( $this, 'register_section' ) );
 		add_filter( 'customize_dynamic_setting_args', array( $this, 'filter_dynamic_setting_args' ), 10, 2 );
 		add_filter( 'customize_dynamic_setting_class', array( $this, 'filter_dynamic_setting_class' ), 10, 3 );
@@ -39,8 +52,13 @@ class Plugin {
 		}
 
 		$handle = 'customize-comments-controls';
-		$src = plugin_dir_url( __DIR__ ) . '/js/controls.js';
-		wp_enqueue_script( $handle, $src, array( 'customize-controls', 'wp-api' ) );
+		if ( ! SCRIPT_DEBUG && file_exists( __DIR__ . '/../js/controls.min.js' ) ) {
+			$src = plugin_dir_url( __DIR__ ) . 'js/controls.min.js';
+		} else {
+			$src = plugin_dir_url( __DIR__ ) . 'js/controls.js';
+		}
+		$deps = array( 'customize-controls', 'wp-api' );
+		wp_enqueue_script( $handle, $src, $deps, $this->version );
 		$exports = array(
 			'l10n' => array(
 				'unableToFetchComment' => __( 'Unable to fetch comment for editing.', 'customize-comments' ),
@@ -61,8 +79,13 @@ class Plugin {
 		}
 
 		$handle = 'customize-comments-preview';
-		$src = plugin_dir_url( __DIR__ ) . '/js/preview.js';
-		wp_enqueue_script( $handle, $src, array( 'customize-selective-refresh' ) );
+		if ( ! SCRIPT_DEBUG && file_exists( __DIR__ . '/../js/preview.min.js' ) ) {
+			$src = plugin_dir_url( __DIR__ ) . 'js/preview.min.js';
+		} else {
+			$src = plugin_dir_url( __DIR__ ) . 'js/preview.js';
+		}
+		$deps = array( 'customize-selective-refresh' );
+		wp_enqueue_script( $handle, $src, $deps, $this->version );
 		wp_add_inline_script( $handle, 'customizeCommentsPreview.init();' );
 	}
 
