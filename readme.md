@@ -23,7 +23,19 @@ The comments are listed with the comment author and publish date along with the 
 
 When you navigate to a post and see the comment list, clicking the "Edit Comment" link in the Customizer preview will cause the comment to be loaded into a new textarea control in the section, and the control will then be focused for editing.
 
+[![Play video on YouTube](https://i1.ytimg.com/vi/-LdT8XO3ys8/hqdefault.jpg)](https://www.youtube.com/watch?v=-LdT8XO3ys8)
+
 This is a natural companion to the [Customize Posts](https://wordpress.org/plugins/customize-posts/) feature plugin.
+
+## Screenshots ##
+
+### Comments edited in the Customizer are previewed with selective refresh.
+
+![Comments edited in the Customizer are previewed with selective refresh.](wp-assets/screenshot-1.png)
+
+### Comment controls appear with permalinks to their parent posts; a load more button dynamically loads new comments from the REST API.
+
+![Comment controls appear with permalinks to their parent posts; a load more button dynamically loads new comments from the REST API.](wp-assets/screenshot-2.png)
 
 ## Changelog ##
 

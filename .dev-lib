@@ -1,2 +1,3 @@
 WPCS_GIT_TREE=develop
 CHECK_SCOPE=all
+ASSETS_DIR=wp-assets
