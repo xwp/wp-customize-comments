@@ -10,7 +10,7 @@ var customizeCommentsPreview = (function( api, $ ) {
 	 *
 	 * @returns {void}
 	 */
-	component.init = function() {
+	component.init = function init() {
 		api.bind( 'preview-ready', component.ready );
 	};
 
@@ -21,12 +21,7 @@ var customizeCommentsPreview = (function( api, $ ) {
 	 */
 	component.ready = function ready() {
 		api.each( component.ensurePartial );
-		api.bind( 'add', function( setting ) {
-			var partial = component.ensurePartial( setting );
-			if ( partial ) {
-				partial.refresh();
-			}
-		} );
+		api.bind( 'add', component.ensurePartial );
 	};
 
 	/**
@@ -99,7 +94,7 @@ var customizeCommentsPreview = (function( api, $ ) {
 	 * @param {wp.customize.Value} setting - Setting.
 	 * @returns {wp.customize.selectiveRefresh.Partial|null} Partial if one was created.
 	 */
-	component.ensurePartial = function( setting ) {
+	component.ensurePartial = function ensurePartial( setting ) {
 		var idParts, commentId, partialId, partial;
 		idParts = setting.id.replace( /]/g, '' ).split( /\[/ );
 		if ( 'comment_content' !== idParts[0] ) {

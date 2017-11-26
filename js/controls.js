@@ -70,18 +70,21 @@ var customizeCommentsControls = (function( api ) {
 		customizeId = 'comment_content[' +  String( comment.id ) + ']';
 
 		// Ensure comment_content setting is created.
-		setting = wp.customize( customizeId );
+		setting = api( customizeId );
 		if ( ! setting ) {
-			setting = new wp.customize.Setting( customizeId, comment.content.raw, {
+			setting = new api.Setting( customizeId, comment.content.raw, {
 				transport: 'postMessage'
 			} );
-			wp.customize.add( setting );
+			api.add( setting );
 		}
 
+		// Ensure the setting is created in the preview.
+		setting.previewer.send( 'setting', [ setting.id, setting() ] );
+
 		// Create control for comment content.
-		control = wp.customize.control( customizeId );
+		control = api.control( customizeId );
 		if ( ! control ) {
-			control = new wp.customize.Control( customizeId, {
+			control = new api.Control( customizeId, {
 				section: 'comments',
 				type: 'textarea',
 				label: wp.template( 'comment-content-control-label' )( comment ),
@@ -92,12 +95,12 @@ var customizeCommentsControls = (function( api ) {
 				},
 				priority: -( new Date( comment.date_gmt ) ).valueOf() // Sort by date.
 			} );
-			wp.customize.control.add( control );
+			api.control.add( control );
 
 			// Load a comment's post into the preview when clicking on the post permalink in the description.
 			control.container.on( 'click', '.comment-post-link', function( event ) {
 				event.preventDefault();
-				wp.customize.previewer.previewUrl.set( this.href );
+				api.previewer.previewUrl.set( this.href );
 			} );
 		}
 
